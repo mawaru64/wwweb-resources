@@ -4,6 +4,7 @@
 
 * [VSCode Extension: Prisma](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
 * DBクライアント
+    * Prisma Studio: `npx prisma studio`
     * [Sequel Ace](https://sequel-ace.com/)
     * [TablePlus](https://tableplus.com/)
     * [VSCode Extension: Database Client](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-database-client2)
