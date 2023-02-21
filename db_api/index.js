@@ -1,24 +1,23 @@
 import express from 'express'
-import initialTasks from './initialTasks.js'
+import { PrismaClient } from '@prisma/client'
 
 
 // 初期設定
 const port = 3000
 const app = express()
 app.use(express.json())
-
-
-// サンプルデータをセット
-const tasks = [...initialTasks]
+const prisma = new PrismaClient()
 
 
 // ルート
 app.get('/', (req, res) => {
-  res.send('Simple APIルートパス')
+  res.send('DB APIルートパス')
 })
 
 // タスクの一覧を取得
-app.get('/tasks', (req, res) => {
+app.get('/tasks', async (req, res) => {
+  const tasks = await prisma.task.findMany()
+
   res.json({
     data: tasks
   })
@@ -32,12 +31,18 @@ app.get('/tasks', (req, res) => {
   * id: タスクのID
     * type: Integer
 */
-app.get('/tasks/:id', (req, res) => {
+app.get('/tasks/:id', async (req, res) => {
   const requestedId = Number(req.params.id)
-  const task = tasks.find(task => task.id === requestedId)
+
+  const task = await prisma.task.findUnique({
+    where: {
+      id: requestedId,
+    }
+  })
 
   res.json(task)
 })
+
 
 /*
   タスクを新規作成
@@ -46,19 +51,17 @@ app.get('/tasks/:id', (req, res) => {
   * [body] title: 新規タスクのタイトル
     * type: String
 */
-app.post('/tasks', (req, res) => {
-  currentIds = tasks.map(task => task.id)
-  const currentMaxId = Math.max(...currentIds)
-
+app.post('/tasks', async (req, res) => {
   const newTask = {
-    id: currentMaxId + 1,
     title: req.body.title,
-    createdAt: (new Date()).toISOString(),
-    completed: false,
+    createdAt: new Date(),
   }
-  tasks.push(newTask)
 
-  res.json(newTask);
+  const queryResult = await prisma.task.create({
+    data: newTask
+  })
+
+  res.json(queryResult);
 })
 
 /*
@@ -76,23 +79,22 @@ app.post('/tasks', (req, res) => {
   * [body] completed: 完了したかどうか
     * type: Boolean
 */
-app.patch('/tasks/:id', (req, res) => {
+app.patch('/tasks/:id', async (req, res) => {
   const requestedId = Number(req.params.id)
 
-  tasks = tasks.map(task => {
-    if (task.id !== requestedId) return task
-
-    return {
-      ...task,
-      title: req.body.title ?? task.title,
-      completed: req.body.completed ?? task.completed,
-    }
+  const queryResult = await prisma.task.update({
+    where: {
+      id: requestedId,
+    },
+    data: {
+      title: req.body.title,
+      completed: req.body.completed,
+    },
   })
 
-  const modifiedTask = tasks.find(task => task.id === requestedId)
-
-  res.json(modifiedTask)
+  res.json(queryResult)
 })
+
 
 /*
   タスクを削除
@@ -102,13 +104,18 @@ app.patch('/tasks/:id', (req, res) => {
   * id: タスクのID
     * type: Integer
 */
-app.delete('/tasks/:id', (req, res) => {
+app.delete('/tasks/:id', async (req, res) => {
   const requestedId = Number(req.params.id)
 
-  tasks = tasks.filter(task => task.id !== requestedId)
+  await prisma.task.delete({
+    where: {
+      id: requestedId,
+    }
+  })
 
   res.status(204).send()
 })
+
 
 // APIサーバを起動
 app.listen(port, () => console.log(`Listening on port ${port}`))
