@@ -14,6 +14,8 @@
         * [Postman](https://cloudsmith.co.jp/blog/efficient/2021/08/1837085.html)
         * [Thunder Client](https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client)
         * [Httpie](https://github.com/httpie/httpie)
+* [ ] [VSCode Extension: OpenAPI (Swagger) Editor](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi)
+    * これを簡易的なAPIクライアントとして使用しても良い
 
 
 ## 初期設定
