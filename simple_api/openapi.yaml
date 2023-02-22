@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: Simple API
+  description: |-
+    This is a Simple API definition.
+  version: 0.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /tasks:
+    get:
+      description: タスク一覧取得
+      operationId: task-index
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+    post:
+      description: タスク新規作成
+      operationId: task-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  $ref: '#/components/schemas/Task/properties/title'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+  /tasks/{taskId}:
+    get:
+      description: タスク詳細取得
+      operationId: task-detail
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+    patch:
+      description: タスク更新
+      operationId: task-update
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  $ref: '#/components/schemas/Task/properties/title'
+                completed:
+                  $ref: '#/components/schemas/Task/properties/completed'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+    delete:
+      description: タスク削除
+      operationId: task-delete
+      parameters:
+        - $ref: '#/components/parameters/taskId'
+      responses:
+        '204':
+          description: 削除成功
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - createdAt
+        - completed
+      properties:
+        id:
+          description: タスクID
+          type: integer
+          example: 1
+        title:
+          description: タイトル
+          type: string
+          example: 仕事する
+        createdAt:
+          description: |
+            作成日時
+            ISO 形式 (ISO 8601) の文字列
+          type: string
+          format: date-time
+          example: '2014-10-10T04:50:40Z'
+        completed:
+          description: 完了したか
+          type: boolean
+          default: false
+          example: true
+  parameters:
+    taskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Task/properties/id'
+  # requestBodies:
+  # responses:
